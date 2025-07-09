@@ -1,30 +1,46 @@
 require('dotenv').config();
-
 const express = require("express");
 const { Client, GatewayIntentBits, ChannelType, PermissionsBitField } = require("discord.js");
+
 const app = express();
 app.use(express.json());
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers] });
+const client = new Client({
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers]
+});
 
 client.once("ready", () => {
   console.log(`Bot is ready! Logged in as ${client.user.tag}`);
 });
 
 app.post("/order", async (req, res) => {
-  const { discordTag, serviceType, description } = req.body;
+  // Destructure the fields based on your form keys
+  const {
+    name,
+    discordUserId,
+    email,
+    serviceType,
+    description,
+    budget,
+    deadline
+  } = req.body;
+
+  console.log("Received order:", req.body); // Log incoming data for debugging
 
   try {
-    const guild = await client.guilds.fetch("1274419828349992980");
+    const guild = await client.guilds.fetch("1274419828349992980"); // Your server ID
     await guild.members.fetch();
 
+    // Find member by ID (better than by tag)
     const member = guild.members.cache.get(discordUserId);
     if (!member) return res.status(404).send("User not found in the server.");
 
+    const channelName = `order-${member.user.username}-${Date.now()}`;
+
     const channel = await guild.channels.create({
-      name: `order-${member.user.username}`,
+      name: channelName,
       type: ChannelType.GuildText,
-      parent: "1392433138814156820", // your Orders category ID
+      parent: "1392433138814156820", // Your Orders category ID
       permissionOverwrites: [
         {
           id: guild.id, // @everyone
@@ -53,12 +69,20 @@ app.post("/order", async (req, res) => {
       ],
     });
 
-    await channel.send(`📩 New order from **${discordTag}**
+    // Compose a detailed message in the order channel
+    const orderMessage = `
+📩 New order from **${name}** (${member.user.tag})
 
-**Service:** ${serviceType}  
+**Service Required:** ${serviceType}
 **Description:** ${description}
+${budget ? `**Budget:** ${budget}` : ''}
+${deadline ? `**Deadline:** ${deadline}` : ''}
+${email ? `**Email:** ${email}` : ''}
 
-A staff member will respond shortly.`);
+A staff member will respond shortly.
+`;
+
+    await channel.send(orderMessage.trim());
 
     res.send("Order received. Channel created.");
   } catch (error) {
@@ -67,8 +91,9 @@ A staff member will respond shortly.`);
   }
 });
 
-client.login(process.env.TOKEN);
+client.login(process.env.BOT_TOKEN);
 
-app.listen(3000, () => {
-  console.log("Server running on port 3000");
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
