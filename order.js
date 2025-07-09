@@ -18,7 +18,7 @@ app.post("/order", async (req, res) => {
     const guild = await client.guilds.fetch("1274419828349992980");
     await guild.members.fetch();
 
-    const member = guild.members.cache.find(m => m.user.tag === discordTag);
+    const member = guild.members.cache.get(discordUserId);
     if (!member) return res.status(404).send("User not found in the server.");
 
     const channel = await guild.channels.create({
