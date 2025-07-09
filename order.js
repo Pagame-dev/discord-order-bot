@@ -91,7 +91,7 @@ A staff member will respond shortly.
   }
 });
 
-client.login(process.env.BOT_TOKEN);
+client.login(process.env.TOKEN);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
