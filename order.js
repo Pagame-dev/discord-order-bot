@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require("express");
 const { Client, GatewayIntentBits, ChannelType, PermissionsBitField } = require("discord.js");
 const app = express();
@@ -65,7 +67,7 @@ A staff member will respond shortly.`);
   }
 });
 
-client.login(process.env.BOT_TOKEN);
+client.login(process.env.TOKEN);
 
 app.listen(3000, () => {
   console.log("Server running on port 3000");
