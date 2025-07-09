@@ -1,0 +1,13 @@
+{
+  "name": "discord-order-bot",
+  "version": "1.0.0",
+  "description": "Order channel creation bot for Discord",
+  "main": "order.js",
+  "scripts": {
+    "start": "node order.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.11.0",
+    "express": "^4.18.2"
+  }
+}
